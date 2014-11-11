@@ -52,8 +52,9 @@ RUN git config --global user.name "$AUTHOR_NAME" && \
     git config --global diff.tool vimdiff && \
     git config --global difftool.prompt false && \
     git config --global alias.d difftool && \
+    git config --global alias.update "fetch origin master --depth=1" && \
     # Allows usage like git qa <bugnumber> to set up a branch based on master and fetch patches for <bugnumber> from bugzilla
-    git config --global alias.qa '!sh -c "git fetch origin master && git rebase origin/master && git checkout -b qa-$1 origin/master && git bz apply $1"' - && \
+    git config --global alias.qa '!sh -c "git fetch origin master --depth=1 && git rebase origin/master && git checkout -b qa-$1 origin/master && git bz apply $1"' - && \
     # Allows usage like git qa-tidy <bugnumber> to remove a qa branch when you are through with it
     git config --global alias.qa-tidy '!sh -c "git checkout master && git branch -D qa-$1"' - && \
     git config --global core.whitespace trailing-space,space-before-tab && \
@@ -65,8 +66,8 @@ RUN cd /kohadev && \
     git clone $GITBZ_REPO gitbz && \
     cd gitbz && git checkout -b fishsoup origin/fishsoup && \
     sudo ln -s /kohadev/gitbz/git-bz /usr/local/bin/git-bz && \
-    git config bz.default-tracker bugs.koha-community.org && \
-    git config bz.default-product Koha && \
+    git config --global bz.default-tracker bugs.koha-community.org && \
+    git config --global bz.default-product Koha && \
     git config --global bz-tracker.bugs.koha-community.org.path /bugzilla3 && \
     git config --global bz-tracker.bugs.koha-community.org.bz-user $BUGZ_USER && \
     git config --global bz-tracker.bugs.koha-community.org.bz-password $BUGZ_PASS
