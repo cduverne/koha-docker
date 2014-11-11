@@ -26,7 +26,8 @@ set -e
 
 
 # Configure Git and some repos
-RUN git config --global user.name "$AUTHOR_NAME" && \
+echo "Configuring git ..."
+git config --global user.name "$AUTHOR_NAME" && \
     git config --global user.email "$AUTHOR_EMAIL" && \
     git config --global color.status auto && \
     git config --global color.branch auto && \
@@ -43,7 +44,8 @@ RUN git config --global user.name "$AUTHOR_NAME" && \
     git config --global apply.whitespace fix
 
 # Configure bugzilla login
-RUN git config --global bz.default-tracker bugs.koha-community.org && \
+echo "Configuring bugzilla..."
+git config --global bz.default-tracker bugs.koha-community.org && \
     git config --global bz.default-product Koha && \
     git config --global bz-tracker.bugs.koha-community.org.path /bugzilla3 && \
     git config --global bz-tracker.bugs.koha-community.org.bz-user $BUGZ_USER && \
