@@ -1,0 +1,60 @@
+.PHONY: all test clean
+
+all: reload build run
+
+reload: halt up provision
+
+halt:
+	vagrant halt
+
+up:
+	vagrant up
+
+provision:
+	vagrant provision
+
+upgrade:
+	vagrant ssh -c 'sudo docker pull digibib/kohadev'
+
+build:
+	@echo "======= BUILDING KOHADEV CONTAINER ======\n"
+	vagrant ssh -c 'sudo docker build -t digibib/kohadev /vagrant/kohadev'
+
+stop: 
+	@echo "======= STOPPING KOHADEV CONTAINER ======\n"
+	vagrant ssh -c 'sudo docker stop kohadev_docker' || true
+
+delete: stop
+	@echo "======= DELETING KOHADEV CONTAINER ======\n"
+	vagrant ssh -c 'sudo docker rm kohadev_docker' || true
+
+run: delete
+	@echo "======= RUNNING KOHADEV CONTAINER WITH LOCAL MYSQL ======\n"
+	@vagrant ssh -c 'sudo docker run -d --name kohadev_docker \
+	-p 80:80 -p 8080:8080 -p 8081:8081 -t digibib/kohadev' || echo "kohadev_docker container already running, please 'make delete' first"
+
+logs:
+	vagrant ssh -c 'sudo docker logs kohadev_docker'
+
+logs-f:
+	vagrant ssh -c 'sudo docker logs -f kohadev_docker'
+
+browser:
+	vagrant ssh -c 'firefox "http://localhost:8081/" > firefox.log 2> firefox.err < /dev/null' &
+
+test: 
+	@echo "======= TESTING KOHADEV CONTAINER ======\n"
+	vagrant ssh -c 'cd vm-test && python test.py kohadev_docker'
+	
+clean:
+	vagrant destroy --force
+
+login: # needs EMAIL, PASSWORD, USERNAME
+	@ vagrant ssh -c 'sudo docker login --email=$(EMAIL) --username=$(USERNAME) --password=$(PASSWORD)'
+
+tag = "$(shell git rev-parse HEAD)"
+push:
+	@echo "======= PUSHING KOHA CONTAINER ======\n"
+	vagrant ssh -c 'sudo docker tag digibib/kohadev digibib/kohadev:$(tag)'
+	vagrant ssh -c 'sudo docker push digibib/kohadev'
+
