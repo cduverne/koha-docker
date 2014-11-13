@@ -20,7 +20,13 @@ Also installed with bugzilla and qa-tools
 
 All environment variables used in setup can be overridden. Complete list is in Dockerfile.
 
-Example:
+Example using makefile:
+
+```
+KOHA_ADMINUSER="superadmin" KOHA_ADMINPASS="superpass" AUTHOR_NAME='"Roger Rabbit"' AUTHOR_EMAIL="rabbit@mail.com" BUGZ_USER="rabbit@mail.com" BUGZ_PASS=77rafi make run
+```
+
+Example from inside Vagrant box:
 
 ```
 sudo docker run -d --name kohadev_docker \

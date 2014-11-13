@@ -28,10 +28,15 @@ delete: stop
 	@echo "======= DELETING KOHADEV CONTAINER ======\n"
 	vagrant ssh -c 'sudo docker rm kohadev_docker' || true
 
-run: delete
+run: delete			## start kohadev container - args: AUTHOR_NAME, AUTHOR_EMAIL, BUGZ_USER, BUGZ_PASS
 	@echo "======= RUNNING KOHADEV CONTAINER WITH LOCAL MYSQL ======\n"
-	@vagrant ssh -c 'sudo docker run -d --name kohadev_docker \
-	-p 80:80 -p 8080:8080 -p 8081:8081 -t digibib/kohadev' || echo "kohadev_docker container already running, please 'make delete' first"
+	vagrant ssh -c 'sudo docker run -d --name kohadev_docker \
+	-p 80:80 -p 6001:6001 -p 8080:8080 -p 8081:8081 \
+	-e AUTHOR_NAME=$(AUTHOR_NAME) \
+	-e AUTHOR_EMAIL=$(AUTHOR_EMAIL) \
+	-e BUGZ_USER=$(BUGZ_USER) \
+	-e BUGZ_PASS=$(BUGZ_PASS) \
+	-t digibib/kohadev' || echo "kohadev_docker container already running, please 'make delete' first"
 
 logs:
 	vagrant ssh -c 'sudo docker logs kohadev_docker'
