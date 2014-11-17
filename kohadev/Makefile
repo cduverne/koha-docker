@@ -38,6 +38,18 @@ run: delete			## start kohadev container - args: AUTHOR_NAME, AUTHOR_EMAIL, BUGZ
 	-e BUGZ_PASS=$(BUGZ_PASS) \
 	-t digibib/kohadev' || echo "kohadev_docker container already running, please 'make delete' first"
 
+update_git:
+	@echo "======= UPGRADING KOHA MASTER ======\n"
+	@ vagrant ssh -c 'sudo docker exec kohadev_docker bash -c "cd /kohadev/kohaclone && git update"'
+
+patch: #update_git             ## needs PATCHES
+	@echo "======= PATCHING KOHADEV CONTAINER ======\n"
+	@vagrant ssh -c 'sudo docker exec -t kohadev_docker /bin/bash -c "cd /kohadev/kohaclone && \
+	(git checkout -b sandbox || true) && \
+	for patch in $(PATCHES) ; do \
+		yes | git bz apply \$$patch ; \
+	done"'
+
 logs:
 	vagrant ssh -c 'sudo docker logs kohadev_docker'
 
