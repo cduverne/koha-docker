@@ -1,29 +1,33 @@
 #!/bin/bash
 set -e
 
-#########################
-# KOHA INSTANCE VARIABLES
-#########################
-
-# ENV KOHA_ADMINUSER admin
-# ENV KOHA_ADMINPASS secret
-# ENV KOHA_INSTANCE  name
-# ENV KOHA_ZEBRAUSER zebrauser
-# ENV KOHA_ZEBRAPASS lkjasdpoiqrr
-
+#######################
+# INSTANCE DEFAULTS
+#######################
+# KOHA_INSTANCE  name
+# KOHA_ADMINUSER admin
+# KOHA_ADMINPASS secret
+# KOHA_ZEBRAUSER zebrauser
+# KOHA_ZEBRAPASS lkjasdpoiqrr
+#######################
+# SIP2 DEFAULT SETTINGS
+#######################
+# SIP_PORT      6001
+# SIP_WORKERS   3
+# SIP_AUTOUSER1 autouser
+# SIP_AUTOPASS1 autopass
 ################################
 # KOHA DEV ENVIRONMENT VARIABLES
 ################################
-
-# ENV AUTHOR_NAME  john_doe
-# ENV AUTHOR_EMAIL john@doe.com
-# ENV BUGZ_USER    bugsquasher
-# ENV BUGZ_PASS    bugspass
-# ENV KOHA_REPO    https://github.com/Koha-Community/Koha.git
-# ENV MY_REPO      https://github.com/digibib/koha-work
-# ENV GITBZ_REPO   https://github.com/digibib/git-bz.git
-# ENV QATOOLS_REPO https://github.com/Koha-Community/qa-test-tools.git
-
+# AUTHOR_NAME  john_doe
+# AUTHOR_EMAIL john@doe.com
+# BUGZ_USER    bugsquasher
+# BUGZ_PASS    bugspass
+# KOHA_REPO    https://github.com/Koha-Community/Koha.git
+# MY_REPO      https://github.com/digibib/koha-work
+# GITBZ_REPO   https://github.com/digibib/git-bz.git
+# QATOOLS_REPO https://github.com/Koha-Community/qa-test-tools.git
+#######################
 
 # Configure Git and some repos
 echo "Configuring git ..."
@@ -79,9 +83,14 @@ salt-call --local state.sls koha.config \
   pillar="{koha: {instance: $KOHA_INSTANCE, adminuser: $KOHA_ADMINUSER, adminpass: $KOHA_ADMINPASS, \
   zebrauser: $KOHA_ZEBRAUSER, zebrapass: $KOHA_ZEBRAPASS}}"
 
+# SIP2 Server config
+salt-call --local state.sls koha.sip2 \
+  pillar="{koha: {instance: $KOHA_INSTANCE, sip_port: $SIP_PORT, \
+  sip_workers: $SIP_WORKERS, sip_autouser1: $SIP_AUTOUSER1, sip_autopass1: $SIP_AUTOPASS1}}"
+
 # Run webinstaller to autoupdate/validate install
 salt-call --local state.sls koha.webinstaller \
- pillar="{koha: {instance: $KOHA_INSTANCE, adminuser: $KOHA_ADMINUSER, adminpass: $KOHA_ADMINPASS}}"
+  pillar="{koha: {instance: $KOHA_INSTANCE, adminuser: $KOHA_ADMINUSER, adminpass: $KOHA_ADMINPASS}}"
 
 /etc/init.d/koha-common restart
 /etc/init.d/apache2 restart
