@@ -42,7 +42,7 @@ update_git:
 	@echo "======= UPGRADING KOHA MASTER ======\n"
 	@ vagrant ssh -c 'sudo docker exec kohadev_docker bash -c "cd /kohadev/kohaclone && git update"'
 
-patch: #update_git             ## needs PATCHES
+patch: update_git             ## needs PATCHES
 	@echo "======= PATCHING KOHADEV CONTAINER ======\n"
 	@vagrant ssh -c 'sudo docker exec -t kohadev_docker /bin/bash -c "cd /kohadev/kohaclone && \
 	(git checkout -b sandbox || true) && \
