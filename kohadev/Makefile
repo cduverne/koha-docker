@@ -59,10 +59,13 @@ logs-f:
 browser:
 	vagrant ssh -c 'firefox "http://localhost:8081/" > firefox.log 2> firefox.err < /dev/null' &
 
-test: 
-	@echo "======= TESTING KOHADEV CONTAINER ======\n"
-	vagrant ssh -c 'cd vm-test && python test.py kohadev_docker'
-	
+wait_until_ready:
+	@echo "=======    wait until ready    ======\n"
+	vagrant ssh -c 'sudo docker exec -t kohadev_docker ./wait_until_ready.py'
+
+test: wait_until_ready
+	@echo "======= TESTING KOHA CONTAINER ======\n"
+
 clean:
 	vagrant destroy --force
 
