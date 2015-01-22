@@ -1,6 +1,6 @@
 ## Kohadev README
 
-This Docker image is a complete Koha development install setup from git source.
+This Docker Vagrant image is a complete Koha development install setup from git source.
 
 It is very simple to setup and ready for use.
 
