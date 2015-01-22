@@ -23,7 +23,7 @@ All environment variables used in setup can be overridden. Complete list is in D
 Example using makefile:
 
 ```
-KOHA_ADMINUSER="superadmin" KOHA_ADMINPASS="superpass" AUTHOR_NAME='"Roger Rabbit"' AUTHOR_EMAIL="rabbit@mail.com" BUGZ_USER="rabbit@mail.com" BUGZ_PASS=77rafi make run
+KOHA_ADMINUSER="superadmin" KOHA_ADMINPASS="superpass" AUTHOR_NAME='"Roger Rabbit"' AUTHOR_EMAIL="rabbit@mail.com" BUGZ_USER="rabbit@mail.com" BUGZ_PASS=wildguess make run
 ```
 
 Example from inside Vagrant box:
