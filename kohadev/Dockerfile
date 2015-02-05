@@ -7,10 +7,10 @@ FROM digibib/koha:latest
 
 MAINTAINER Oslo Public Library "digitalutvikling@gmail.com"
 
-ENV REFRESHED_AT 2015-01-20
+ENV REFRESHED_AT 2015-02-04
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    sudo apt-get install -q -y cpanminus vim git-email && \
+    sudo apt-get install -q -y cpanminus vim git-email telnet screen wget less curl htop && \
     apt-get clean
 
 #########################
