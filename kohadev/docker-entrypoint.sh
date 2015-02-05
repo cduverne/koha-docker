@@ -96,4 +96,9 @@ salt-call --local state.sls koha.webinstaller \
 /etc/init.d/apache2 restart
 /etc/init.d/cron restart
 
-exec "$@"
+/usr/bin/tail -f /var/log/apache2/access.log \
+  /var/log/koha/${KOHA_INSTANCE}/intranet*.log \
+  /var/log/koha/${KOHA_INSTANCE}/opac*.log \
+  /var/log/koha/${KOHA_INSTANCE}/zebra*.log \
+  /var/log/apache2/other_vhosts_access.log \
+  /var/log/koha/${KOHA_INSTANCE}/sip*.log

@@ -60,9 +60,9 @@ WORKDIR /root
 COPY docker-entrypoint.sh /root/entrypoint.sh
 ENTRYPOINT ["/root/entrypoint.sh"]
 
-EXPOSE 8080 8081
+EXPOSE 6001 8080 8081
 
 VOLUME ["/kohadev"]
 
-# Might be koha-common (Zebra) should be stand-alone container
-CMD ["/usr/bin/tail", "-f", "/var/log/apache2/access.log", "/var/log/koha/name/intranet-error.log", "/var/log/koha/name/opac-error.log", "/var/log/koha/name/zebra-error.log", "/var/log/apache2/other_vhosts_access.log"]
+# Script for checking if koha is up & ready (to be executed using docker exec)
+COPY docker-wait_until_ready.py /root/wait_until_ready.py
