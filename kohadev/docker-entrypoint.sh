@@ -84,7 +84,7 @@ salt-call --local state.sls koha.config \
   zebrauser: $KOHA_ZEBRAUSER, zebrapass: $KOHA_ZEBRAPASS}}"
 
 # SIP2 Server config
-salt-call --local state.sls koha.sip2 \
+salt-call --local state.sls koha.sip2-dev \
   pillar="{koha: {instance: $KOHA_INSTANCE, sip_port: $SIP_PORT, \
   sip_workers: $SIP_WORKERS, sip_autouser1: $SIP_AUTOUSER1, sip_autopass1: $SIP_AUTOPASS1}}"
 
