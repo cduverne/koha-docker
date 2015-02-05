@@ -53,8 +53,10 @@ RUN cd /kohadev && \
 # Apache dev settings
 ADD apache-kohadev.conf /srv/salt/koha/files/apache.tmpl
 ADD koha-conf.xml.tmpl /srv/salt/koha/files/koha-conf.xml.tmpl
-ADD ../salt/koha/sip2-dev.sls /srv/salt/koha/sip2-dev.sls
-ADD ../salt/koha/sip2-dev-stop.sls /srv/salt/koha/sip2-dev-stop.sls
+
+# Use SIP2 Development version from git
+ADD sip2-dev.sls /srv/salt/koha/sip2-dev.sls
+ADD sip2-dev-stop.sls /srv/salt/koha/sip2-dev-stop.sls
 
 ENV HOME /root
 WORKDIR /root
