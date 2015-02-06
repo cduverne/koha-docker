@@ -16,6 +16,8 @@ Also installed with bugzilla and qa-tools
 
 `make logs-f` runs a tail on logs inside container
 
+`make test`  test sanity of koha container
+
 ## Advanced Usage
 
 All environment variables used in setup can be overridden. Complete list is in Dockerfile.
@@ -39,3 +41,9 @@ sudo docker run -d --name kohadev_docker \
   -e BUGZ_PASS=rabbitz \
   -t digibib/kohadev
 ```
+
+## Patching and testing
+
+`PATHCES="bug_id1 bug_id2 ..." make patch` patch repo with one or more bugzilla patches
+
+`make reset_git`  deletes git clone and makes new clone (faster than git pull...)

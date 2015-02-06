@@ -38,11 +38,11 @@ run: delete			## start kohadev container - args: AUTHOR_NAME, AUTHOR_EMAIL, BUGZ
 	-e BUGZ_PASS=$(BUGZ_PASS) \
 	-t digibib/kohadev' || echo "kohadev_docker container already running, please 'make delete' first"
 
-update_git:
-	@echo "======= UPGRADING KOHA MASTER ======\n"
-	@ vagrant ssh -c 'sudo docker exec kohadev_docker bash -c "cd /kohadev/kohaclone && git update"'
+reset_git:			## Resets git by removing and doing new shallow clone
+	@echo "======= RELOADING CLEAN KOHA MASTER ======\n"
+	vagrant ssh -c "sudo docker exec kohadev_docker bash -c 'cd /kohadev && rm -rf kohaclone && git clone --depth 1 \$$KOHA_REPO kohaclone'"
 
-patch: update_git             ## needs PATCHES
+patch:					## needs PATCHES
 	@echo "======= PATCHING KOHADEV CONTAINER ======\n"
 	@vagrant ssh -c 'sudo docker exec -t kohadev_docker /bin/bash -c "cd /kohadev/kohaclone && \
 	(git checkout -b sandbox || true) && \
@@ -60,11 +60,11 @@ browser:
 	vagrant ssh -c 'firefox "http://localhost:8081/" > firefox.log 2> firefox.err < /dev/null' &
 
 wait_until_ready:
-	@echo "=======    wait until ready    ======\n"
+	@echo "======= WAIT UNTIL READY ======\n"
 	vagrant ssh -c 'sudo docker exec -t kohadev_docker ./wait_until_ready.py'
 
 test: wait_until_ready
-	@echo "======= TESTING KOHA CONTAINER ======\n"
+	@echo "======= TESTING KOHA CONTAINER SANITY ======\n"
 
 clean:
 	vagrant destroy --force
