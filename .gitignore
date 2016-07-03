@@ -1,3 +1,5 @@
 .vagrant*
 orca
 build.log
+docker-compose/secrets.env
+provision

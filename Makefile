@@ -1,20 +1,42 @@
 .PHONY: all test clean
 
+KOHAENV ?= dev
+
+ifdef NOVAGRANT
+CMD=bash
+KOHAPATH=$(shell pwd)
+NOVAGRANT=true
+HOST ?= localhost
+DOCKER_GW=172.19.0.1
+else
+CMD=vagrant ssh $(SHIP)
+KOHAPATH=/vagrant
+HOST ?= 192.168.50.1
+DOCKER_GW=$(HOST)
+NOVAGRANT=false
+endif
+
 all: reload build run
 
 reload: halt up provision
 
 halt:
-	vagrant halt
+	@$(NOVAGRANT) || vagrant halt
+	@$(NOVAGRANT) && sudo $(CMD) -c "cd $(KOHAPATH)/docker-compose && sudo docker-compose down" || true
 
-up:
-	vagrant up
+up:                                              ##
+	@$(NOVAGRANT) || vagrant up
+	@$(NOVAGRANT) && sudo $(CMD) -c "cd $(KOHAPATH)/docker-compose && sudo docker-compose up -d" || true
 
-provision:
-	vagrant provision
+shell_provision:					## Run ONLY shell provisioners
+	@$(NOVAGRANT) || vagrant provision --provision-with shell
+	-@$(NOVAGRANT) && ./provision.sh $(KOHAENV) $(KOHAPATH)
 
-upgrade:
-	vagrant ssh -c 'sudo docker pull mysql && sudo docker pull debian:wheezy && sudo docker pull busybox'
+provision:  shell_provision   	## Full provision
+
+wait_until_ready:
+	@echo "=======    wait until ready    ======\n"
+	$(CMD) -c 'sudo docker exec -t koha_docker ./wait_until_ready.py'
 
 mysql: create_data_volume mysql_pull_if_missing mysql_start
 
@@ -167,9 +189,6 @@ nsenter:
 browser:
 	vagrant ssh -c 'firefox "http://localhost:8081/" > firefox.log 2> firefox.err < /dev/null' &
 
-wait_until_ready:
-	@echo "=======    wait until ready    ======\n"
-	vagrant ssh -c 'sudo docker exec -t koha_docker ./wait_until_ready.py'
 
 test: wait_until_ready
 	@echo "======= TESTING KOHA CONTAINER ======\n"

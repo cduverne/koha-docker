@@ -1,0 +1,106 @@
+---
+version: '2'
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  koha:
+    container_name: koha_patched
+    build:
+      context: "/home/benjab/github/digibib/koha-docker/koha-patched"
+      dockerfile: Dockerfile
+    networks:
+      - backend
+    depends_on:
+      - koha_mysql
+      - sip
+    cap_add:
+      - SYS_NICE
+      - DAC_READ_SEARCH
+      - MKNOD
+    volumes:
+      - /home/benjab/github/digibib/koha-docker/koha-patched/patches:/patches
+      - /home/benjab/github/digibib/koha-docker/koha-patched/debian:/debian
+    environment:
+      KOHA_ADMINPASS: "secret"
+      KOHA_ADMINUSER: "admin"
+      KOHA_INSTANCE: "name"
+      KOHA_DBHOST: koha_mysql
+      DEFAULT_LANGUAGE: nb-NO
+      EMAIL_ENABLED: "True"
+      SMTP_SERVER_HOST: mailrelay # access through network 'backend'
+      SMTP_SERVER_PORT: 2525
+      MESSAGE_QUEUE_FREQUENCY: 1
+      SMS_SERVER_HOST: "https://tjenester-systest.oslo.kommune.no:443/intern/mailsms/SendSms"
+      API_PASSPHRASE: "tropmasucjisad"
+      NLBASEUSER: "2030000"
+      NLBASEPASS: "E4080"
+      NLVENDORURL: "https://fl.lanekortet.no/laanekort/fl_test.php"
+      NLVENDORUSER: "oslokommune"
+      NLVENDORPASS: "j39SDx01"
+      NLVENDORKEY: "rh3fHuiv4dnaiDra"
+    ports:
+      - "6001:6001"
+      - "8080:8080"
+      - "8081:8081"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "2"
+
+  koha_mysql:
+    container_name: koha_mysql
+    image: mysql:5.6.20
+    networks:
+      - backend
+    cap_add:
+      - MKNOD
+    command:
+      - mysqld
+      - "--datadir=/var/lib/mysql"
+      - "--user=mysql"
+      - "--max_allowed_packet=64M"
+      - "--wait_timeout=6000"
+      - "--bind-address=0.0.0.0"
+    environment:
+      MYSQL_DATABASE: "koha_name"
+      MYSQL_PASSWORD: "secret"
+      MYSQL_ROOT_PASSWORD: "secret"
+      MYSQL_USER: "admin"
+    ports:
+      - "3306:3306"
+    volumes_from:
+      - koha_mysql_data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "2"
+
+  koha_mysql_data:
+    container_name: koha_mysql_data
+    image: "busybox:latest"
+    volumes:
+      - /var/lib/mysql
+
+  sip:
+    container_name: sip_proxy_container
+    image: "digibib/tcp-proxy:14dc5417bf211317351a0bae084db12c64a1dd45"
+    networks:
+      - backend
+    ports:
+      - "6002:9999"
+    command:
+      - "/app/tcp-proxy"
+      - "-vv"
+      - "-r"
+      - ":6001"
+      - "-replace=(|AB)10([0-9]{14})~$$1$$2"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "2"
